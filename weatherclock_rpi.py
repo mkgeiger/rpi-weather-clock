@@ -242,7 +242,7 @@ def update_staticiaq():
     global icon_iaq
     
     canvas.delete('staticiaq')
-    canvas.create_rectangle(staticiaq_x, staticiaq_y, staticiaq_x + 160, staticiaq_y + 160, fill="#202020", tags=('static iaq'))
+    canvas.create_rectangle(staticiaq_x, staticiaq_y, staticiaq_x + 160, staticiaq_y + 160, fill="#202020", tags=('staticiaq'))
     if (mqtt_staticiaq != "---.-"):
         if (float(mqtt_staticiaq) < 100.0):     
             icon_iaq = ImageTk.PhotoImage(Image.open("./Icons/IAQ_good.png"))
@@ -251,7 +251,7 @@ def update_staticiaq():
         else:
             icon_iaq = ImageTk.PhotoImage(Image.open("./Icons/IAQ_bad.png"))
         
-        canvas.create_image(staticiaq_x + 16, staticiaq_y + 16, anchor = NW, image = icon_iaq, tags=('static iaq'))
+        canvas.create_image(staticiaq_x + 16, staticiaq_y + 16, anchor = NW, image = icon_iaq, tags=('staticiaq'))
 
 def update_pressure():
     global icon_pre
