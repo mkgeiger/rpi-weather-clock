@@ -43,6 +43,10 @@ I use the Raspberry Pi Zero WH which has enough performance, a low power consump
 * mqtt_topic_intemperature = "/483fdabaceba/temperature"
 * mqtt_topic_inhumidity = "/483fdabaceba/humidity"
 * mqtt_topic_staticiaq = "/483fdaaaceba/staticiaq"
+* mqtt_topic_ppurchase = "/00d0935D9eb9/ppurchase"
+* mqtt_topic_pfeed = "/00d0935D9eb9/pfeed"
+* mqtt_topic_pconsume = "/00d0935D9eb9/pconsume"
+* mqtt_topic_pgenerate = "/00d0935D9eb9/pgenerate"
 
 ## Internet services used
 * Tiles for the map background from Openstreetmap: e.g. https://tile.openstreetmap.org/12/2148/1409.png
