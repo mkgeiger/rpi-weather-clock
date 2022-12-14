@@ -24,7 +24,7 @@ xmin = 2148
 ymin = 1409
 
 # mqtt settings
-mqtt_user = "********"
+mqtt_user = "**********"
 mqtt_password = "****************"
 mqtt_broker_address = "192.168.1.10"
 mqtt_port = 1883
@@ -34,6 +34,10 @@ mqtt_topic_outhumidity = "/outdoor/humidity"
 mqtt_topic_intemperature = "/483fdaaaceba/temperature"
 mqtt_topic_inhumidity = "/483fdaaaceba/humidity"
 mqtt_topic_staticiaq = "/483fdaaaceba/staticiaq"
+mqtt_topic_ppurchase = "/00d0935D9eb9/ppurchase"
+mqtt_topic_pfeed = "/00d0935D9eb9/pfeed"
+mqtt_topic_pconsume = "/00d0935D9eb9/pconsume"
+mqtt_topic_pgenerate = "/00d0935D9eb9/pgenerate"
 
 # coordinates
 day_weather_x    = 2
@@ -54,6 +58,14 @@ pressure_x       = 672
 pressure_y       = 288
 staticiaq_x      = 512
 staticiaq_y      = 0
+ppurchase_x      = 512
+ppurchase_y      = 416
+pfeed_x          = 672
+pfeed_y          = 416
+pconsume_x       = 672
+pconsume_y       = 448
+pgenerate_x      = 512
+pgenerate_y      = 448
 
 # variables to hold measured values
 mqtt_intemperature = "--.-"
@@ -67,6 +79,10 @@ dwd_outhumidity = "---.-"
 mqtt_pressure = "----.-"
 dwd_pressure = "----.-"
 mqtt_staticiaq = "---.-"
+mqtt_ppurchase = "-----"
+mqtt_pfeed = "-----"
+mqtt_pconsume = "-----"
+mqtt_generate = "-----"
 
 # display settings
 display_on_time = 6000  # 10min
@@ -88,7 +104,7 @@ class circularlist(object):
         self.index = (self.index + 1) % self.size
 
     def length(self):
-	    return(len(self._data))
+        return(len(self._data))
 
     def __getitem__(self, key):
         """Get element by index, relative to the current index"""
@@ -96,11 +112,11 @@ class circularlist(object):
             return(self._data[(key + self.index) % self.size])
         else:
             return(self._data[key])
-		
+
     def __repr__(self):
         """Return string representation"""
         return (self._data[self.index:] + self._data[:self.index]).__repr__() + ' (' + str(len(self._data))+'/{} items)'.format(self.size)
-		
+
 def calc_pressure_tendency(l, start_index, end_index):
     # define tendency by linear regression
     avr_x = sum([x for x in range(start_index, end_index)]) / (end_index - start_index)
@@ -181,9 +197,6 @@ def update_inhumidity():
     canvas.delete('inhumidity')
     canvas.create_rectangle(inhumidity_x, inhumidity_y, inhumidity_x + 354, inhumidity_y + 32, fill="#202020", tags=('inhumidity'))
     canvas.create_rectangle(inhumidity_x, inhumidity_y + 32, 1023, inhumidity_y + 64, fill="#202020", tags=('inhumidity'))
-    canvas.create_rectangle(inhumidity_x - 160, inhumidity_y + 64, inhumidity_x + 354, inhumidity_y + 96, fill="#303030", tags=('inhumidity'))
-    canvas.create_rectangle(inhumidity_x - 160, inhumidity_y + 96, inhumidity_x + 354, inhumidity_y + 128, fill="#303030", tags=('inhumidity'))
-    canvas.create_rectangle(inhumidity_x - 160, inhumidity_y + 128, inhumidity_x + 354, inhumidity_y + 160, fill="#303030", tags=('inhumidity'))
     canvas.create_text(inhumidity_x + 4, inhumidity_y, text = "Raumluftfeuchte: ", font=("Arial", 20), anchor = NW, fill = "#ffffff", tags=('inhumidity')) 
     canvas.create_text(inhumidity_x + 214, inhumidity_y, text = mqtt_inhumidity + " %rF", font=("Arial", 20), anchor = NW, fill = "#ffff00", tags=('inhumidity'))
 
@@ -250,7 +263,7 @@ def update_staticiaq():
             icon_iaq = ImageTk.PhotoImage(Image.open("./Icons/IAQ_medium.png")) 
         else:
             icon_iaq = ImageTk.PhotoImage(Image.open("./Icons/IAQ_bad.png"))
-        
+
         canvas.create_image(staticiaq_x + 16, staticiaq_y + 16, anchor = NW, image = icon_iaq, tags=('staticiaq'))
 
 def update_pressure():
@@ -269,6 +282,26 @@ def update_pressure():
         icon_pre = ImageTk.PhotoImage(Image.open("./Icons/pressure_tendency_4.png"))
         canvas.create_image(pressure_x + 290, pressure_y + 1, anchor = NW, image = icon_pre, tags=('pressure'))
 
+def update_ppurchase():
+    canvas.delete('ppurchase')
+    canvas.create_rectangle(ppurchase_x, ppurchase_y, ppurchase_x + 160, ppurchase_y + 32, fill="#303030", tags=('ppurchase'))
+    canvas.create_text(ppurchase_x + 4, ppurchase_y, text = mqtt_ppurchase.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ff0000", tags=('ppurchase'))
+
+def update_pfeed():
+    canvas.delete('pfeed')
+    canvas.create_rectangle(pfeed_x, pfeed_y, pfeed_x + 160, pfeed_y + 32, fill="#303030", tags=('pfeed'))
+    canvas.create_text(pfeed_x + 4, pfeed_y, text = mqtt_pfeed.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ffff00", tags=('pfeed'))
+
+def update_pconsume():
+    canvas.delete('pconsume')
+    canvas.create_rectangle(pconsume_x, pconsume_y, pconsume_x + 160, pconsume_y + 32, fill="#303030", tags=('pconsume'))
+    canvas.create_text(pconsume_x + 4, pconsume_y, text = mqtt_pconsume.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ffffff", tags=('pconsume'))
+
+def update_pgenerate():
+    canvas.delete('pgenerate')
+    canvas.create_rectangle(pgenerate_x, pgenerate_y, pgenerate_x + 160, pgenerate_y + 32, fill="#303030", tags=('pgenerate'))
+    canvas.create_text(pgenerate_x + 4, pgenerate_y, text = mqtt_pgenerate.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#00ff00", tags=('pgenerate'))
+
 def on_message(client, userdata, message):
     global mqtt_intemperature
     global mqtt_inhumidity
@@ -276,6 +309,11 @@ def on_message(client, userdata, message):
     global mqtt_outhumidity
     global mqtt_pressure
     global mqtt_staticiaq
+    global mqtt_ppurchase
+    global mqtt_pfeed
+    global mqtt_pconsume
+    global mqtt_pgenerate
+
     msg = str(message.payload.decode("utf-8"))
     #print("message received: ", msg)
     #print("message topic: ", message.topic)
@@ -301,6 +339,18 @@ def on_message(client, userdata, message):
     if (message.topic == mqtt_topic_staticiaq):
         mqtt_staticiaq = msg
         update_staticiaq()
+    if (message.topic == mqtt_topic_ppurchase):
+        mqtt_ppurchase = msg
+        update_ppurchase()
+    if (message.topic == mqtt_topic_pfeed):
+        mqtt_pfeed = msg
+        update_pfeed()
+    if (message.topic == mqtt_topic_pconsume):
+        mqtt_pconsume = msg
+        update_pconsume()
+    if (message.topic == mqtt_topic_pgenerate):
+        mqtt_pgenerate = msg
+        update_pgenerate()
 
 def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT Broker: " + mqtt_broker_address)
@@ -310,12 +360,20 @@ def on_connect(client, userdata, flags, rc):
     mqtt_outhumidity = "---.-"
     mqtt_pressure = "----.-"
     mqtt_staticiaq = "---"
+    mqtt_ppurchase = "-----"
+    mqtt_pfeed = "-----"
+    mqtt_pconsume = "-----"
+    mqtt_pgenerate = "-----"
     client.subscribe(mqtt_topic_intemperature)
     client.subscribe(mqtt_topic_inhumidity)    
     client.subscribe(mqtt_topic_outtemperature)
     client.subscribe(mqtt_topic_outhumidity)
     client.subscribe(mqtt_topic_pressure)
     client.subscribe(mqtt_topic_staticiaq)
+    client.subscribe(mqtt_topic_ppurchase)
+    client.subscribe(mqtt_topic_pfeed)
+    client.subscribe(mqtt_topic_pconsume)
+    client.subscribe(mqtt_topic_pgenerate)
 
 def draw_pointer(x, y):
     global icon_pointer
@@ -623,7 +681,7 @@ def getImageClusterMap(xmin, ymin, xmax,  ymax, zoom):
                 tile = Image.open("./Map/" + str(xtile) + "_" + str(ytile) + ".png")
                 Cluster.paste(tile, box=((xtile-xmin)*256, (ytile-ymin)*256))
     return Cluster
-   
+
 def getImageClusterRadar(xmin, ymin, xmax,  ymax, zoom):
     global im_black_single
 
