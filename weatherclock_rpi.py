@@ -38,6 +38,8 @@ mqtt_topic_ppurchase = "/00d0935D9eb9/ppurchase"
 mqtt_topic_pfeed = "/00d0935D9eb9/pfeed"
 mqtt_topic_pconsume = "/00d0935D9eb9/pconsume"
 mqtt_topic_pgenerate = "/00d0935D9eb9/pgenerate"
+mqtt_topic_pdischarge = "/00d0935D9eb9/pdischarge"
+mqtt_topic_pcharge = "/00d0935D9eb9/pcharge"
 
 # coordinates
 day_weather_x    = 2
@@ -62,10 +64,14 @@ ppurchase_x      = 512
 ppurchase_y      = 416
 pfeed_x          = 672
 pfeed_y          = 416
-pconsume_x       = 672
-pconsume_y       = 448
 pgenerate_x      = 512
 pgenerate_y      = 448
+pconsume_x       = 672
+pconsume_y       = 448
+pdischarge_x     = 512
+pdischarge_y     = 480
+pcharge_x        = 672
+pcharge_y        = 480
 
 # variables to hold measured values
 mqtt_intemperature = "--.-"
@@ -82,7 +88,9 @@ mqtt_staticiaq = "---.-"
 mqtt_ppurchase = "-----"
 mqtt_pfeed = "-----"
 mqtt_pconsume = "-----"
-mqtt_generate = "-----"
+mqtt_pgenerate = "-----"
+mqtt_pdischarge = "-----"
+mqtt_pcharge = "-----"
 
 # display settings
 display_on_time = 6000  # 10min
@@ -283,24 +291,58 @@ def update_pressure():
         canvas.create_image(pressure_x + 290, pressure_y + 1, anchor = NW, image = icon_pre, tags=('pressure'))
 
 def update_ppurchase():
+    global icon_ppurchase
+
     canvas.delete('ppurchase')
     canvas.create_rectangle(ppurchase_x, ppurchase_y, ppurchase_x + 160, ppurchase_y + 32, fill="#303030", tags=('ppurchase'))
-    canvas.create_text(ppurchase_x + 4, ppurchase_y, text = mqtt_ppurchase.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ff0000", tags=('ppurchase'))
+    icon_ppurchase = ImageTk.PhotoImage(Image.open("./Icons/P_purchase.png"))
+    canvas.create_image(ppurchase_x + 1, ppurchase_y + 1, anchor = NW, image = icon_ppurchase, tags=('ppurchase'))
+    canvas.create_text(ppurchase_x + 36, ppurchase_y, text = mqtt_ppurchase.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ff0000", tags=('ppurchase'))
 
 def update_pfeed():
+    global icon_pfeed
+
     canvas.delete('pfeed')
     canvas.create_rectangle(pfeed_x, pfeed_y, pfeed_x + 160, pfeed_y + 32, fill="#303030", tags=('pfeed'))
-    canvas.create_text(pfeed_x + 4, pfeed_y, text = mqtt_pfeed.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ffff00", tags=('pfeed'))
+    icon_pfeed = ImageTk.PhotoImage(Image.open("./Icons/P_feed.png"))
+    canvas.create_image(pfeed_x + 1, pfeed_y + 1, anchor = NW, image = icon_pfeed, tags=('pfeed'))
+    canvas.create_text(pfeed_x + 36, pfeed_y, text = mqtt_pfeed.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ffff00", tags=('pfeed'))
 
 def update_pconsume():
+    global icon_pconsume
+
     canvas.delete('pconsume')
     canvas.create_rectangle(pconsume_x, pconsume_y, pconsume_x + 160, pconsume_y + 32, fill="#303030", tags=('pconsume'))
-    canvas.create_text(pconsume_x + 4, pconsume_y, text = mqtt_pconsume.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ffffff", tags=('pconsume'))
+    icon_pconsume = ImageTk.PhotoImage(Image.open("./Icons/P_consume.png"))
+    canvas.create_image(pconsume_x + 1, pconsume_y + 1, anchor = NW, image = icon_pconsume, tags=('pconsume'))
+    canvas.create_text(pconsume_x + 36, pconsume_y, text = mqtt_pconsume.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#ffffff", tags=('pconsume'))
 
 def update_pgenerate():
+    global icon_pgenerate
+
     canvas.delete('pgenerate')
     canvas.create_rectangle(pgenerate_x, pgenerate_y, pgenerate_x + 160, pgenerate_y + 32, fill="#303030", tags=('pgenerate'))
-    canvas.create_text(pgenerate_x + 4, pgenerate_y, text = mqtt_pgenerate.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#00ff00", tags=('pgenerate'))
+    icon_pgenerate = ImageTk.PhotoImage(Image.open("./Icons/P_generate.png"))
+    canvas.create_image(pgenerate_x + 1, pgenerate_y + 1, anchor = NW, image = icon_pgenerate, tags=('pgenerate'))
+    canvas.create_text(pgenerate_x + 36, pgenerate_y, text = mqtt_pgenerate.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#00ff00", tags=('pgenerate'))
+
+def update_pdischarge():
+    global icon_pdischarge
+
+    canvas.delete('pdischarge')
+    canvas.create_rectangle(pdischarge_x, pdischarge_y, pdischarge_x + 160, pdischarge_y + 32, fill="#303030", tags=('pdischarge'))
+    icon_pdischarge = ImageTk.PhotoImage(Image.open("./Icons/P_batdischarge.png"))
+    canvas.create_image(pdischarge_x + 1, pdischarge_y + 1, anchor = NW, image = icon_pdischarge, tags=('pdischarge'))
+    canvas.create_text(pdischarge_x + 36, pdischarge_y, text = mqtt_pdischarge.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#8080ff", tags=('pdischarge'))
+
+def update_pcharge():
+    global icon_pcharge
+
+    canvas.delete('pcharge')
+    canvas.create_rectangle(pcharge_x, pcharge_y, pcharge_x + 160, pcharge_y + 32, fill="#303030", tags=('pcharge'))
+    icon_pcharge = ImageTk.PhotoImage(Image.open("./Icons/P_batcharge.png"))
+    canvas.create_image(pcharge_x + 1, pcharge_y + 1, anchor = NW, image = icon_pcharge, tags=('pcharge'))
+    canvas.create_text(pcharge_x + 36, pcharge_y, text = mqtt_pcharge.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#0000ff", tags=('pcharge'))
 
 def on_message(client, userdata, message):
     global mqtt_intemperature
@@ -313,6 +355,8 @@ def on_message(client, userdata, message):
     global mqtt_pfeed
     global mqtt_pconsume
     global mqtt_pgenerate
+    global mqtt_pdischarge
+    global mqtt_pcharge
 
     msg = str(message.payload.decode("utf-8"))
     #print("message received: ", msg)
@@ -351,6 +395,12 @@ def on_message(client, userdata, message):
     if (message.topic == mqtt_topic_pgenerate):
         mqtt_pgenerate = msg
         update_pgenerate()
+    if (message.topic == mqtt_topic_pdischarge):
+        mqtt_pdischarge = msg
+        update_pdischarge()
+    if (message.topic == mqtt_topic_pcharge):
+        mqtt_pcharge = msg
+        update_pcharge()
 
 def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT Broker: " + mqtt_broker_address)
@@ -364,6 +414,8 @@ def on_connect(client, userdata, flags, rc):
     mqtt_pfeed = "-----"
     mqtt_pconsume = "-----"
     mqtt_pgenerate = "-----"
+    mqtt_pdischarge = "-----"
+    mqtt_pcharge = "-----"
     client.subscribe(mqtt_topic_intemperature)
     client.subscribe(mqtt_topic_inhumidity)    
     client.subscribe(mqtt_topic_outtemperature)
@@ -374,6 +426,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(mqtt_topic_pfeed)
     client.subscribe(mqtt_topic_pconsume)
     client.subscribe(mqtt_topic_pgenerate)
+    client.subscribe(mqtt_topic_pdischarge)
+    client.subscribe(mqtt_topic_pcharge)
 
 def draw_pointer(x, y):
     global icon_pointer
@@ -661,6 +715,13 @@ def update_mqtt_data():
     update_outhumidity()
     update_pressure()
     update_staticiaq()
+    update_ppurchase()
+    update_pfeed()
+    update_pconsume()
+    update_pgenerate()
+    update_pdischarge()
+    update_pcharge()
+
     # update every 1 min
     window.after(60000, update_mqtt_data)
 
