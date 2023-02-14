@@ -47,6 +47,8 @@ I use the Raspberry Pi Zero WH which has enough performance, a low power consump
 * mqtt_topic_pfeed = "/00d0935D9eb9/pfeed"
 * mqtt_topic_pconsume = "/00d0935D9eb9/pconsume"
 * mqtt_topic_pgenerate = "/00d0935D9eb9/pgenerate"
+* mqtt_topic_pdischarge = "/00d0935D9eb9/pdischarge"
+* mqtt_topic_pcharge = "/00d0935D9eb9/pcharge"
 
 ## Internet services used
 * Tiles for the map background from Openstreetmap: e.g. https://tile.openstreetmap.org/12/2148/1409.png
