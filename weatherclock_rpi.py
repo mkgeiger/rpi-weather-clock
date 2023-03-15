@@ -40,6 +40,9 @@ mqtt_topic_pconsume = "/00d0935D9eb9/pconsume"
 mqtt_topic_pgenerate = "/00d0935D9eb9/pgenerate"
 mqtt_topic_pdischarge = "/00d0935D9eb9/pdischarge"
 mqtt_topic_pcharge = "/00d0935D9eb9/pcharge"
+mqtt_topic_sbatcharge = "/00d0935D9eb9/sbatcharge"
+mqtt_topic_eyield = "/00d0935D9eb9/eyield"
+mqtt_topic_eabsorb = "/00d0935D9eb9/eabsorb"
 
 # coordinates
 day_weather_x    = 2
@@ -60,18 +63,24 @@ pressure_x       = 672
 pressure_y       = 288
 staticiaq_x      = 512
 staticiaq_y      = 0
-ppurchase_x      = 512
-ppurchase_y      = 416
-pfeed_x          = 672
-pfeed_y          = 416
+pconsume_x       = 512
+pconsume_y       = 416
 pgenerate_x      = 512
 pgenerate_y      = 448
-pconsume_x       = 672
-pconsume_y       = 448
 pdischarge_x     = 512
 pdischarge_y     = 480
+ppurchase_x      = 672
+ppurchase_y      = 416
+pfeed_x          = 672
+pfeed_y          = 448
 pcharge_x        = 672
 pcharge_y        = 480
+eabsorb_x        = 832
+eabsorb_y        = 416
+eyield_x         = 832
+eyield_y         = 448
+sbatcharge_x     = 832
+sbatcharge_y     = 480
 
 # variables to hold measured values
 mqtt_intemperature = "--.-"
@@ -91,6 +100,9 @@ mqtt_pconsume = "-----"
 mqtt_pgenerate = "-----"
 mqtt_pdischarge = "-----"
 mqtt_pcharge = "-----"
+mqtt_eabsorb = "-----.-"
+mqtt_eyield = "-----.-"
+mqtt_sbatcharge = "--"
 
 # display settings
 display_on_time = 6000  # 10min
@@ -342,7 +354,34 @@ def update_pcharge():
     canvas.create_rectangle(pcharge_x, pcharge_y, pcharge_x + 160, pcharge_y + 32, fill="#303030", tags=('pcharge'))
     icon_pcharge = ImageTk.PhotoImage(Image.open("./Icons/P_batcharge.png"))
     canvas.create_image(pcharge_x + 1, pcharge_y + 1, anchor = NW, image = icon_pcharge, tags=('pcharge'))
-    canvas.create_text(pcharge_x + 36, pcharge_y, text = mqtt_pcharge.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#0000ff", tags=('pcharge'))
+    canvas.create_text(pcharge_x + 36, pcharge_y, text = mqtt_pcharge.split(".")[0] + " W", font=("Arial", 20), anchor = NW, fill = "#8080ff", tags=('pcharge'))
+
+def update_eabsorb():
+    global icon_eabsorb
+
+    canvas.delete('eabsorb')
+    canvas.create_rectangle(eabsorb_x, eabsorb_y, eabsorb_x + 192, eabsorb_y + 32, fill="#303030", tags=('eabsorb'))
+    icon_eabsorb = ImageTk.PhotoImage(Image.open("./Icons/E_absorb.png"))
+    canvas.create_image(eabsorb_x + 1, eabsorb_y + 1, anchor = NW, image = icon_eabsorb, tags=('eabsorb'))
+    canvas.create_text(eabsorb_x + 36, eabsorb_y, text = mqtt_eabsorb.split(".")[0] + " kWh", font=("Arial", 20), anchor = NW, fill = "#ff0000", tags=('eabsorb'))
+
+def update_eyield():
+    global icon_eyield
+
+    canvas.delete('eyield')
+    canvas.create_rectangle(eyield_x, eyield_y, eyield_x + 192, eyield_y + 32, fill="#303030", tags=('eyield'))
+    icon_eyield = ImageTk.PhotoImage(Image.open("./Icons/E_yield.png"))
+    canvas.create_image(eyield_x + 1, eyield_y + 1, anchor = NW, image = icon_eyield, tags=('eyield'))
+    canvas.create_text(eyield_x + 36, eyield_y, text = mqtt_eyield.split(".")[0] + " kWh", font=("Arial", 20), anchor = NW, fill = "#ffff00", tags=('eyield'))
+
+def update_sbatcharge():
+    global icon_sbatcharge
+
+    canvas.delete('sbatcharge')
+    canvas.create_rectangle(sbatcharge_x, sbatcharge_y, sbatcharge_x + 192, sbatcharge_y + 32, fill="#303030", tags=('sbatcharge'))
+    icon_sbatcharge = ImageTk.PhotoImage(Image.open("./Icons/S_batcharge.png"))
+    canvas.create_image(sbatcharge_x + 1, sbatcharge_y + 1, anchor = NW, image = icon_sbatcharge, tags=('sbatcharge'))
+    canvas.create_text(sbatcharge_x + 36, sbatcharge_y, text = mqtt_sbatcharge + " %", font=("Arial", 20), anchor = NW, fill = "#8080ff", tags=('sbatcharge'))
 
 def on_message(client, userdata, message):
     global mqtt_intemperature
@@ -357,6 +396,9 @@ def on_message(client, userdata, message):
     global mqtt_pgenerate
     global mqtt_pdischarge
     global mqtt_pcharge
+    global mqtt_eabsorb
+    global mqtt_eyield
+    global mqtt_sbatcharge
 
     msg = str(message.payload.decode("utf-8"))
     #print("message received: ", msg)
@@ -401,6 +443,15 @@ def on_message(client, userdata, message):
     if (message.topic == mqtt_topic_pcharge):
         mqtt_pcharge = msg
         update_pcharge()
+    if (message.topic == mqtt_topic_eabsorb):
+        mqtt_eabsorb = msg
+        update_eabsorb()
+    if (message.topic == mqtt_topic_eyield):
+        mqtt_eyield = msg
+        update_eyield()
+    if (message.topic == mqtt_topic_sbatcharge):
+        mqtt_sbatcharge = msg
+        update_sbatcharge()
 
 def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT Broker: " + mqtt_broker_address)
@@ -416,6 +467,9 @@ def on_connect(client, userdata, flags, rc):
     mqtt_pgenerate = "-----"
     mqtt_pdischarge = "-----"
     mqtt_pcharge = "-----"
+    mqtt_eabsorb = "-----.-"
+    mqtt_eyield = "-----.-"
+    mqtt_sbatcharge = "--"
     client.subscribe(mqtt_topic_intemperature)
     client.subscribe(mqtt_topic_inhumidity)    
     client.subscribe(mqtt_topic_outtemperature)
@@ -428,6 +482,9 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(mqtt_topic_pgenerate)
     client.subscribe(mqtt_topic_pdischarge)
     client.subscribe(mqtt_topic_pcharge)
+    client.subscribe(mqtt_topic_eabsorb)
+    client.subscribe(mqtt_topic_eyield)
+    client.subscribe(mqtt_topic_sbatcharge)
 
 def draw_pointer(x, y):
     global icon_pointer
@@ -721,6 +778,9 @@ def update_mqtt_data():
     update_pgenerate()
     update_pdischarge()
     update_pcharge()
+    update_eabsorb()
+    update_eyield()
+    update_sbatcharge()
 
     # update every 1 min
     window.after(60000, update_mqtt_data)
