@@ -3,6 +3,8 @@ This project is a dashboard for Raspberry Pi to display environmental weather da
 
 <img src="/dashboard.jpg" alt="drawing" width="1000"/>
 
+<img src="/screenshot.png" alt="drawing" width="1000"/>
+
 ## Display
 I used a 7inch IPS display with 1024x600 hardware resolution and HDMI input, which has a low power consumption of only 1-2 Watt which is predestinated for 24/7 operation. An RCWL-0516 doppler radar microwave motion sensor module is used to switch off the backlight when no motion has been detected for the last 10 minutes. This is for saving energy when nobody is in the room to watch the dashboard. The backlight is switched on automatically when motion is detected. 
 
