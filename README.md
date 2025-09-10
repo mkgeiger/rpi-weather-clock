@@ -34,6 +34,11 @@ I use the Raspberry Pi Zero WH which has enough performance, a low power consump
 * xmin = 2148
 * ymin = 1409
 
+In order to not get locked out by Openstreetmap due to high frequent accesses there is a possibility to run hte weather clock only with offline maps. In this case you need to download your map tiles only once manually.
+To get the tiles from Openstreetmap please enter the URL with following format:
+```https://tile.openstreetmap.org/{zoom}/{x}/{y}.png``` and store them in the map folder with the format ```{x}_{y}.png```.
+In the python script call ```getImageClusterMap()``` with parameter ```offline==True```.
+
 ### Please change following variables according to your MQTT settings:
 * mqtt_user = "*********"
 * mqtt_password = "***************"

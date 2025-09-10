@@ -785,20 +785,24 @@ def update_mqtt_data():
     # update every 1 min
     window.after(60000, update_mqtt_data)
 
-def getImageClusterMap(xmin, ymin, xmax,  ymax, zoom):
+def getImageClusterMap(xmin, ymin, xmax,  ymax, zoom, offline):
     smurl = r"https://tile.openstreetmap.org/{0}/{1}/{2}.png" 
 
     Cluster = Image.new('RGBA',((xmax-xmin+1)*256,(ymax-ymin+1)*256) ) 
     for xtile in range(xmin, xmax+1):
         for ytile in range(ymin,  ymax+1):
-            try:
-                imgurl=smurl.format(zoom, xtile, ytile)
-                #print("Opening: " + imgurl)
-                imgstr = requests.get(imgurl)
-                tile = Image.open(BytesIO(imgstr.content))
-                Cluster.paste(tile, box=((xtile-xmin)*256, (ytile-ymin)*256))
-            except: 
-                print("Couldn't download map image")
+            if (offline == False):
+                try:
+                    imgurl=smurl.format(zoom, xtile, ytile)
+                    #print("Opening: " + imgurl)
+                    imgstr = requests.get(imgurl)
+                    tile = Image.open(BytesIO(imgstr.content))
+                    Cluster.paste(tile, box=((xtile-xmin)*256, (ytile-ymin)*256))
+                except: 
+                    print("Couldn't download map image")
+                    tile = Image.open("./Map/" + str(xtile) + "_" + str(ytile) + ".png")
+                    Cluster.paste(tile, box=((xtile-xmin)*256, (ytile-ymin)*256))
+            else:
                 tile = Image.open("./Map/" + str(xtile) + "_" + str(ytile) + ".png")
                 Cluster.paste(tile, box=((xtile-xmin)*256, (ytile-ymin)*256))
     return Cluster
@@ -881,7 +885,7 @@ def main():
    im_black = Image.new("RGBA", ((xmax-xmin+1)*256,(ymax-ymin+1)*256), (0, 0, 0, 0))
 
    #map image
-   im_map = getImageClusterMap(xmin, ymin, xmax, ymax, zoom)
+   im_map = getImageClusterMap(xmin, ymin, xmax, ymax, zoom, True)
    im_map = im_map.convert("RGBA")
 
    im_rad = Image.new('RGBA',((xmax-xmin+1)*256,(ymax-ymin+1)*256))
