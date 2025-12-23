@@ -1,43 +1,46 @@
-# Weather Clock for Raspberry PI
-This project is a dashboard for Raspberry Pi to display environmental weather data, rain radar, weather forecast, etc. on a connected LCD written in Python. The data is collected from local MQTT broker and also from Internet services.
+# Weather Clock v2.0 for Raspberry PI
+This project is a dashboard with a Raspberry Pi to display weather data, rain radar, weather forecast, home automation data, etc. on a connected LCD written in Python. The grafical user interface (GIU) is diplayed in so called kiosk mode (no mouse cursor, no window bars, etc.). The data is collected from a local MQTT broker but also from Internet servers providing map data, weather forecast data, rain radar, etc. The rain radar supports actually only radar data from DWD (Deutscher Wetter Dienst).
 
-<img src="/dashboard.jpg" alt="drawing" width="1000"/>
-
-<img src="/screenshot.png" alt="drawing" width="1000"/>
+<img src="./screenshot.png" alt="drawing" width="1000"/>
 
 ## Display
-I used a 7inch IPS display with 1024x600 hardware resolution and HDMI input, which has a low power consumption of only 1-2 Watt which is predestinated for 24/7 operation. An RCWL-0516 doppler radar microwave motion sensor module is used to switch off the backlight when no motion has been detected for the last 10 minutes. This is for saving energy when nobody is in the room to watch the dashboard. The backlight is switched on automatically when motion is detected. 
+I use a 7 inch IPS Waveshare display with 1024x600 pixels physical resolution, to which I adjusted the geometry of the weather clock GUI. It has and HDMI input and a low power consumption of only 1-2 Watt which is perfect for running 24/7. The power supply happens over the pin header of the Raspberry Pi. Detailed installation instructions you can find on the following Wiki page:
 
 https://www.waveshare.com/wiki/7inch_HDMI_LCD
 
-## Raspberry PI
-I use the Raspberry Pi Zero WH which has enough performance, a low power consumption and an HDMI connector. Also it is possible to connect it directly to the backside of the Waveshare display. Only a mini-HDMI (type C) to normal-HDMI (type A) cable is required. The whole system (RPI + display) can be powered over the USB connector and consumes in total a maximum of 4 Watt.
+## Raspberry Pi
+For version v2.0 I spent an upgrade because the radar overlay requires significantly more computing power: the Raspberry Pi 2 Zero W with its Quad-core ARMv8, but still with a low power consumption and an HDMI connector. Also it is possible to connect it directly to the backside of the Waveshare display. Only an additional mini-HDMI (type C) to normal-HDMI (type A) cable is required. The whole system (RPI + display) can be powered over the USB connector and consumes in total a maximum of only 5 Watt.
 
-## Software on the Raspberry PI
-* Use a 16Gbyte SD card and install Raspberry Pi OS on it
-* Configure graphics driver and resolution as described on https://www.waveshare.com/wiki/7inch_HDMI_LCD
-* Configure a static IP within your WiFi network
-* Activate SSH for remote configuration, SW update and maintainance
+## Human Presence Sensor
 
-### Install following packages used by the Python program:
-* pip install python3-utils
-* sudo apt-get install python3-pil python3-pil.imagetk
-* sudo apt-get install python3-pip -y
-* sudo pip3 install paho-mqtt
+For version v2.0 I also spent an upgrade for the radar sensor because the previously used RCWL-0516 interfered a lot with the Wi-Fi frequencies and caused many false positive triggers: the **LD2410C** human presense sensor module, whose radar frequency operates much higher at 24 GHz, is used to switch off the backlight when no motion of human bodies has been detected for the last 5 minutes. This is mainly for saving energy when nobody is in the room to watch the dashboard. The backlight is switched on automatically when motion is detected. The **OUT-pin** of the module is connected to the **GPIO 16** of the Raspberry Pi. Configuration of the sensivity of this radar module can easily be done per Bluetooth (BLE).
+
+<img src="./LD2410C.png" alt="drawing" width="500"/>
+
+## Software on the Raspberry Pi
+* Use at least a **16 Gbyte SD card** and install the latest Raspberry Pi OS (arm64, trixie, not the Lite version) on it. Use the Raspberry Pi Imager for a quick and easy way to install the SD card.
+* Configure the graphics driver and resolution as described on https://www.waveshare.com/wiki/7inch_HDMI_LCD
+* Configure preferable a static IP within your Wi-Fi network
+* Activate **SSH** for remote configuration, SW update and maintainance
+* Configure autostart of the weather clock script by creating a **.desktop** file
+
+### Install following packages used by the Python script:
+* Python 3 is typically installed already with version 3.15.x, so no need to upgrade this
+* sudo apt update
+* sudo apt install -y python3-h5py
+* sudo apt install -y python3-matplotlib
+* sudo apt install -y python3-pyproj
+* sudo apt install -y python3-paho-mqtt
 
 ## Weather Clock configuration
-### Please change following variables according to your location. The value for xmin and ymin can be determined with https://oms.wff.ch/calc.htm for a specific zoom level.
-* longitude = "8.900"
-* latiude  = "48.800"
+### Please change following variables according to your location and your preferred wishes.
+* longitude = "8.862"
+* latiude  = "48.806"
 * timezone = "Europe/Berlin"
-* zoom = 12
-* xmin = 2148
-* ymin = 1409
+* zoom = 11   [8...12]
+* radar_background = "esri_topo" ["esri_topo"|"esri_satellite"|"esri_street"|"osm"|"grid"|"topographic"|"simple"]
 
-In order to not get locked out by Openstreetmap due to high frequent accesses there is a possibility to run hte weather clock only with offline maps. In this case you need to download your map tiles only once manually.
-To get the tiles from Openstreetmap please enter the URL with following format:
-```https://tile.openstreetmap.org/{zoom}/{x}/{y}.png``` and store them in the map folder with the format ```{x}_{y}.png```.
-In the python script call ```getImageClusterMap()``` with parameter ```offline==True```.
+The radar background (map) is downloaded as tiles in the desired zoom level when the weatherclock script is started the very first time. The tiles are stored in a tile cache and are loaded from there for all subsequent startups and draw updates of the rain radar. Only if there is a change to above listed configuration variables the background tiles need to be downloaded and cached again. This cache mechanism reduces internet traffic to a minimum.
 
 ### Please change following variables according to your MQTT settings:
 * mqtt_user = "*********"
@@ -60,11 +63,28 @@ In the python script call ```getImageClusterMap()``` with parameter ```offline==
 * mqtt_topic_eyield = "/00d0935D9eb9/eyield"
 * mqtt_topic_eabsorb = "/00d0935D9eb9/eabsorb"
 
+Hint: *You can deactivate the drawing of a widget if you don't need it by commenting out the responsible draw method. Feel free to implement your own widget.*
+
 ## Internet services used
-* Tiles for the map background from Openstreetmap: e.g. https://tile.openstreetmap.org/12/2148/1409.png
-* Rainviewer API: https://api.rainviewer.com/public/weather-maps.json
-* Tiles for the rain radar as overlay from Rainviewer: e.g. https://tilecache.rainviewer.com/v2/radar/1636462800/256/12/2148/1409/2/1_1.png
-* Actual weather and weather forecast from BrightSky (DWD open weaher data): e.g. https://api.brightsky.dev/weather?lat=48.80&lon=8.90&date=2021-10-18&tz=Europe/Berlin
+* Tiles for the map background from Openstreetmap: e.g. https://tile.openstreetmap.org/{z}/{x}/{y}.png
+* Tiles for the map background from Esri: e.g. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}, https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}, https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}
+* DWD HX radar composite: https://opendata.dwd.de/weather/radar/composite/hx/composite_hx_LATEST-hd5
+* Actual weather and weather forecast from BrightSky (DWD open weather data): e.g. https://api.brightsky.dev/weather?lat=48.80&lon=8.90&date=2021-10-18&tz=Europe/Berlin
 
 ## The program
-Execute the program with: python3 ./weatherclock_rpi.py
+Because rain radar processing and projection on a map background became with v2.0 much more complex as just downloading rain radar tiles from a tile server like from RainViewer, I decided to implement this stuff in a separate class in file **RadarProcessor.py**. The class is limited actually to support only DWD radar data, means covering only Germany. It uses the DWD HX radar composite product in HDF5 format, where the reflectivity is measured in dBZ and which is updated every 5 minutes. Also the class supports features like:
+* different map backgrounds
+* cities overlay
+* download only on new radar data (typically every 5 minutes)
+* original HX radar dBZ colors
+* heatmap gaussian filtering for smooth antialzed rain radar visualization
+* using exact projection which comes with DWD radar data
+* tile caching, to reduce the traffic with map servers to a minimum
+
+Also **weatherclock_rpi.py** itself has been improved to solve some known bugs, e.g. a flickering issue which was frequently observed when widgets were updated/redrawn and MQTT stability/reconnection. The support for downloading tiles from RainViewer has been replaced by downloading and processing rain radar data from DWD.
+
+Execute the script (for running on a Raspberry Pi) with: **python3 ./weatherclock_rpi.py**
+
+Execute following script for running the weather clock on a PC under Linux or Windows: **python3 ./weatherclock_pc.py**
+
+To test the rain radar stand-alone you can execute: **python3 ./rain.py**

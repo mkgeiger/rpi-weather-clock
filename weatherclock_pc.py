@@ -18,7 +18,7 @@ import json
 import requests
 import paho.mqtt.client as mqtt
 from RadarProcessor import RadarProcessor
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 
 script_dir = None
 window = None
@@ -1048,14 +1048,14 @@ def update_clock():
     global old_time
     global display_on_time
 
-    if GPIO.input(16):
-        display_on_time = 3000  # keep display on for 5 minutes
+    #if GPIO.input(16):
+    #    display_on_time = 3000  # keep display on for 5 minutes
 
-    if (display_on_time > 0):
-        display_on()
-        display_on_time = display_on_time - 1
-    else:
-        display_off()
+    #if (display_on_time > 0):
+    #    display_on()
+    #    display_on_time = display_on_time - 1
+    #else:
+    #    display_off()
 
     # local time
     loc_time = time.strftime('%H:%M')
@@ -1264,9 +1264,9 @@ def main():
 
    script_dir = os.path.dirname(os.path.realpath(__file__))
 
-   GPIO.setmode(GPIO.BCM)
-   GPIO.setwarnings(False)
-   GPIO.setup(16, GPIO.IN)
+   #GPIO.setmode(GPIO.BCM)
+   #GPIO.setwarnings(False)
+   #GPIO.setup(16, GPIO.IN)
 
    # Create radar processor
    radar = RadarProcessor(
@@ -1546,8 +1546,8 @@ def main():
    window.after(500, mqtt_poll)  # Start polling after 500ms
    window.after(10000, mqtt_watchdog)  # Start watchdog after 10 seconds
 
-   window.geometry("1024x600+0+0")
-   window.overrideredirect(True)
+   #window.geometry("1024x600+0+0")
+   #window.overrideredirect(True)
    window.config(cursor="none")
 
    # Set up signal handlers for clean shutdown
